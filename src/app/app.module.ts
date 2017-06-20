@@ -18,6 +18,7 @@ import { AlertService } from './services/alert.service';
 import { AuthenticationService } from './services/authentication.service';
 import { UserService } from './services/user.service';
 import { UserprofileComponent } from './userprofile/userprofile.component';
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { UserprofileComponent } from './userprofile/userprofile.component';
     AlertComponent,
     RegisterComponent,
     LoginComponent,
-    UserprofileComponent
+    UserprofileComponent,
+    ProfileComponent
 
   ],
   imports: [

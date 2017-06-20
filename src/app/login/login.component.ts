@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../services/authentication.service';
-import {  AlertService } from '../services/alert.service';
+import { AlertService } from '../services/alert.service';
+import { Http, Headers, Response, RequestOptions } from '@angular/http';
+import { AppConfig } from '../app.config';
+
 
 @Component({
   selector: 'app-login',
@@ -9,35 +12,43 @@ import {  AlertService } from '../services/alert.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-      model: any = {};
-      loading = false;
-      returnUrl: string;
+  model: any = {};
+  loading = false;
+  returnUrl: string;
 
-      constructor(
-            private route: ActivatedRoute,
-            private router: Router,
-            private authenticationService: AuthenticationService,
-            private alertService: AlertService) { }
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private _http: Http,
+    private authenticationService: AuthenticationService,
+    private alertService: AlertService,
+    private config : AppConfig) { }
 
-      ngOnInit() {
-            // reset login status
-            this.authenticationService.logout();
+  ngOnInit() {
+    // reset login status
+   // this.authenticationService.logout();
 
-            // get return url from route parameters or default to '/'
-            this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-      }
-  
-      login() {
-            this.loading = true; 
-      this.authenticationService.login(this.model.username, this.model.password)
-                  .subscribe(
-                      data => {
-                            this.router.navigate([this.returnUrl]);
-                      },
-                      error => {
-          console.log(error.json()); //gives the object object
+    // get return url from route parameters or default to '/'
+if(this.config.TokenKey)
+    this.router.navigate(['home']);
+  }
 
-                            this.alertService.error(error._body);
-                            this.loading = false;});
-      }
+  login() {
+    this.authenticationService.loging(this.model.username, this.model.password).
+      then(
+      response => {
+        localStorage.setItem(this.config.Accesstoken, response.json().access_token);
+        localStorage.setItem(this.config.Expiresin, response.json().expires_in);
+        localStorage.setItem(this.config.TokenType, response.json().token_type);
+        localStorage.setItem(this.config.UserName, response.json().userName);
+        localStorage.setItem(this.config.TokenKey,response.json());
+        this.router.navigate(['home']);
+      },
+      error => {
+        this.alertService.error(error.json().error_description);
+        this.loading = false;
+      });
+
+
+  }
 }
